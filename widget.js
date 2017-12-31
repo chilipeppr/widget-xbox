@@ -145,7 +145,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         /**
          * Keep track of whether we sent flood/coolant on or off last time
          */
-        lastFloodCoolantCmd: "",
+        lastCoolantCmd: "",
         /**
          * This object holds the Gamepad library from https://github.com/kallaspriit/HTML5-JavaScript-Gamepad-Controller-Library
          */
@@ -206,15 +206,15 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         			// Got B button for Feedhold
         			that.sendGcode("!");
         		} else if (e.control == "FACE_4") {
-        			// Got Flood / coolant toggle
+        			// Got coolant toggle
         			
         			// See what we sent last time and send other cmd
-        			if (that.lastFloodCoolantCmd == "M7") {
-        				that.sendGcode("M8");
-        				that.lastFloodCoolantCmd = "M8";
+        			if (that.lastCoolantCmd == "M7") {
+        				that.sendGcode("M9");
+        				that.lastCoolantCmd = "M9";
         			} else {
         				that.sendGcode("M7");
-        				that.lastFloodCoolantCmd = "M7";
+        				that.lastCoolantCmd = "M7";
         			}
         		}
         	});
