@@ -166,7 +166,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		if (device.id.match(/xbox/i)) {
         		    console.log("found xbox controller;");
         		    chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
-        		    "Xbox Controller Found", "Device: " + JSON.stringify(device, null, "\t"), 3000, false); 
+        		    "Xbox Controller Found", "Device: " + JSON.stringify(device, null, "\t"), 500, false); 
         		}
         	});
         
