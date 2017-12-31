@@ -143,6 +143,10 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             console.log("I am done being initted.");
         },
         /**
+         * Keep track of whether we sent flood/coolant on or off last time
+         */
+        lastFloodCoolantCmd: "",
+        /**
          * This object holds the Gamepad library from https://github.com/kallaspriit/HTML5-JavaScript-Gamepad-Controller-Library
          */
         Gamepad: null, // library
@@ -167,6 +171,9 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             // Create convenience variables
             var Gamepad = this.Gamepad;
             var gamepad = this.gamepad;
+            
+            // Keep reference to main "this" object so we can reference inside inner functions
+            var that = this;
             
             // Attach to events
             gamepad.bind(Gamepad.Event.CONNECTED, function(device) {
@@ -194,6 +201,22 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		console.log("e.control of gamepad e.gamepad pressed down. e:", e);
         		chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
         		    "Xbox Controller Button Down", "Control: " + e.control, 500, true); 
+        		    
+        		if (e.control == "FACE_2") {
+        			// Got B button for Feedhold
+        			that.sendGcode("!");
+        		} else if (e.control == "FACE_4") {
+        			// Got Flood / coolant toggle
+        			
+        			// See what we sent last time and send other cmd
+        			if (that.lastFloodCoolantCmd == "M7") {
+        				that.sendGcode("M8");
+        				that.lastFloodCoolantCmd = "M8";
+        			} else {
+        				that.sendGcode("M7");
+        				that.lastFloodCoolantCmd = "M7";
+        			}
+        		}
         	});
         	
         	gamepad.bind(Gamepad.Event.BUTTON_UP, function(e) {
@@ -221,6 +244,22 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             // 		    "Xbox Controller Initted", "Your browser supports Gamepad controllers.", null, 3000, true); 
         	   // }, 2000);
         	}
+        },
+        /**
+         * Send Gcode to the CNC controller using the awesome pubsub commands available
+         * throughout the ChiliPeppr environment. Check any widget to see what pubsubs they
+         * support for other widgets to publish to.
+         */
+        sendGcode: function(gcode) {
+        	// make sure there is a newline
+        	if (gcode.match(/\n$/)) {
+        		// already a newline at end
+        		// console.log("already has newline");
+        	} else {
+        		gcode += "\n";
+        		// console.log("added newline");
+        	}
+        	chilipeppr.publish("/com-chilipeppr-widget-serialport/send", gcode);
         },
         /**
          * This method sets up the body of the widget, which at this time just allows you to
