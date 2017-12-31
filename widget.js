@@ -138,6 +138,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             this.forkSetup();
             
             this.setupGamepad();
+            this.setupBody();
 
             console.log("I am done being initted.");
         },
@@ -146,14 +147,19 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         setupGamepad: function() {
             
             // We used code from https://github.com/kallaspriit/HTML5-JavaScript-Gamepad-Controller-Library
+            
+            // This gets up the library object
             this.Gamepad = new this.initGamepadLibrary();
             console.log("Gamepad:", this.Gamepad);
+            // This instantiates a usable object
             this.gamepad = new this.Gamepad();
             console.log("gamepad:", this.gamepad);
             
+            // Create convenience variables
             var Gamepad = this.Gamepad;
             var gamepad = this.gamepad;
             
+            // Attach to events
             gamepad.bind(Gamepad.Event.CONNECTED, function(device) {
         		// a new gamepad connected
         		console.log("new gamepad connected. device:", device);
@@ -193,9 +199,9 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		    "Xbox Controller Axis Changed", "Axis: " + e.axis + ", Value:" + e.value, 500, true); 
         	});
         
-        // 	gamepad.bind(Gamepad.Event.TICK, function(gamepads) {
-        		// gamepads were updated (around 60 times a second)
-        // 	});
+	        // 	gamepad.bind(Gamepad.Event.TICK, function(gamepads) {
+	        		// gamepads were updated (around 60 times a second)
+	        // 	});
             
             if (!gamepad.init()) {
         		// Your browser does not support gamepads, get the latest Google Chrome or Firefox
@@ -206,6 +212,18 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             // 		    "Xbox Controller Initted", "Your browser supports Gamepad controllers.", null, 3000, true); 
         	   // }, 2000);
         	}
+        },
+        setupBody: function() {
+        	// Make image clickable to show modal
+        	
+        	var mainImg = $('#' + this.id + " .panel-body img");
+        	mainImg.on('click', this.onMainBodyImgClick.bind(this));
+			
+        },
+        onMainBodyImgClick: function(evt) {
+        	console.log("got click on main image body. evt:", evt);
+        	var modal = $('#com-chilipeppr-widget-xbox-modal');
+			modal.modal();
         },
         /**
          * Call this method from init to setup all the buttons when this widget
