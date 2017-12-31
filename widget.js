@@ -142,8 +142,17 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
 
             console.log("I am done being initted.");
         },
+        /**
+         * This object holds the Gamepad library from https://github.com/kallaspriit/HTML5-JavaScript-Gamepad-Controller-Library
+         */
         Gamepad: null, // library
+        /**
+         * This object holds the instance of Gamepad library in a usable object.
+         */
         gamepad: null, // instance
+        /**
+         * This method sets up the events we bind to for receiving incoming actions from the Xbox controller.
+         */
         setupGamepad: function() {
             
             // We used code from https://github.com/kallaspriit/HTML5-JavaScript-Gamepad-Controller-Library
@@ -213,6 +222,10 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         	   // }, 2000);
         	}
         },
+        /**
+         * This method sets up the body of the widget, which at this time just allows you to
+         * click the image to get a modal popup for a larger version of the image.
+         */
         setupBody: function() {
         	// Make image clickable to show modal
         	
