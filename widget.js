@@ -446,7 +446,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
 
         },
         /**
-         * Inits the Gamepad library from:
+         * Load the Gamepad library from: https://github.com/kallaspriit/HTML5-JavaScript-Gamepad-Controller-Library
          */
         initGamepadLibrary: function() {
             
