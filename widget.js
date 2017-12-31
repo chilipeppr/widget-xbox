@@ -157,6 +157,11 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             gamepad.bind(Gamepad.Event.CONNECTED, function(device) {
         		// a new gamepad connected
         		console.log("new gamepad connected. device:", device);
+        		if (device.id.match(/xbox/i)) {
+        		    console.log("found xbox controller;");
+        		    chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
+        		    "Xbox Controller Found", "Device: " + device.toString(), 3000, false); 
+        		}
         	});
         
         	gamepad.bind(Gamepad.Event.DISCONNECTED, function(device) {
@@ -172,6 +177,8 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         	gamepad.bind(Gamepad.Event.BUTTON_DOWN, function(e) {
         		// e.control of gamepad e.gamepad pressed down
         		console.log("e.control of gamepad e.gamepad pressed down. e:", e);
+        		chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
+        		    "Xbox Controller Button Down", "Control: " + e.control, 500, true); 
         	});
         	
         	gamepad.bind(Gamepad.Event.BUTTON_UP, function(e) {
@@ -182,6 +189,8 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         	gamepad.bind(Gamepad.Event.AXIS_CHANGED, function(e) {
         		// e.axis changed to value e.value for gamepad e.gamepad
         		console.log(" e.axis changed to value e.value for gamepad e.gamepad. e:", e);
+        		chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
+        		    "Xbox Controller Axis Changed", "Axis: " + e.axis + ", Value:" + e.value, 500, true); 
         	});
         
         // 	gamepad.bind(Gamepad.Event.TICK, function(gamepads) {
@@ -191,6 +200,11 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             if (!gamepad.init()) {
         		// Your browser does not support gamepads, get the latest Google Chrome or Firefox
         		console.log("Your browser does not support gamepads, get the latest Google Chrome or Firefox");
+        	} else {
+        	   // setTimeout(function() {
+            // 	    chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
+            // 		    "Xbox Controller Initted", "Your browser supports Gamepad controllers.", null, 3000, true); 
+        	   // }, 2000);
         	}
         },
         /**
