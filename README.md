@@ -14,10 +14,10 @@ not conflict with other ChiliPeppr widgets.
 | ID                    | com-chilipeppr-widget-xbox |
 | Name                  | Widget / Xbox |
 | Description           | This widget lets you control ChiliPeppr from an Xbox controller. |
-| chilipeppr.load() URL | http://raw.githubusercontent.com/https://master/auto-generated-widget.html |
-| Edit URL              | http://ide.c9.io/root/widget-xbox |
-| Github URL            | http://github.com/https:/ |
-| Test URL              | https://preview.c9users.io/root/widget-xbox/widget.html |
+| chilipeppr.load() URL | https://raw.githubusercontent.com/chilipeppr/widget-xbox/master/auto-generated-widget.html |
+| Edit URL              | https://us-west-2.console.aws.amazon.com/cloud9/ide/83c03ab3f6f9431aa813882decbfc4aa |
+| Github URL            | https://github.com/chilipeppr/widget-xbox |
+| Test URL              | https://vfs.cloud9.us-west-2.amazonaws.com/vfs/83c03ab3f6f9431aa813882decbfc4aa/preview/widget-xbox/widget.html |
 
 ## Example Code for chilipeppr.load() Statement
 

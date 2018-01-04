@@ -602,10 +602,16 @@ will you build on top of it?
   md = md.replace(/\$widget-id/g, widget.id);
   md = md.replace(/\$widget-name/g, widget.name);
   md = md.replace(/\$widget-desc/g, widget.desc);
+  /*
   md = md.replace(/\$widget-cpurl/g, github.rawurl);
   md = md.replace(/\$widget-editurl/g, editUrl);
   md = md.replace(/\$widget-giturl/g, github.url);
   md = md.replace(/\$widget-testurl/g, testUrl);
+  */
+  md = md.replace(/\$widget-cpurl/g, widget.url);
+  md = md.replace(/\$widget-editurl/g, widget.fiddleurl);
+  md = md.replace(/\$widget-giturl/g, widget.githuburl);
+  md = md.replace(/\$widget-testurl/g, widget.testurl);
   
   var cpload = generateCpLoadStmt();
   md = md.replace(/\$widget-cploadjs/g, cpload);
