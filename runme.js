@@ -1207,11 +1207,20 @@ var generateWidgetDocs = function() {
   html = html.replace(/\$pubsub-id/g, widget.id);
   html = html.replace(/\$pubsub-name/g, widget.name);
   html = html.replace(/\$pubsub-desc/g, widget.desc);
+
+  /*
   html = html.replace(/\$pubsub-url/g, github.rawurl);
   html = html.replace(/\$pubsub-fiddleurl/g, editUrl);
   html = html.replace(/\$pubsub-github/g, github.url);
   html = html.replace(/\$pubsub-testurlnossl/g, testUrlNoSsl);
   html = html.replace(/\$pubsub-testurl/g, testUrl);
+  */
+  
+  html = html.replace(/\$pubsub-url/g, widget.url);
+  html = html.replace(/\$pubsub-fiddleurl/g, widget.fiddleurl);
+  html = html.replace(/\$pubsub-github/g, widget.githuburl);
+  html = html.replace(/\$pubsub-testurlnossl/g, widget.testurl);
+  html = html.replace(/\$pubsub-testurl/g, widget.testurl);
   
   var cpload = generateCpLoadStmt();
   html = html.replace(/\$cp-load-stmt/g, cpload);
