@@ -241,10 +241,10 @@ var evalWidgetJs = function() {
 
   var reUrl = /(url\s*:\s*['"]?)\(auto fill by runme\.js\)/;
   //console.log("reUrl:", reUrl);
-  widgetSrc = widgetSrc.replace(reUrl, "$1" + github.rawurl);
-  widgetSrc = widgetSrc.replace(/(fiddleurl\s*:\s*['"]?)\(auto fill by runme\.js\)/, "$1" + editUrl);
-  widgetSrc = widgetSrc.replace(/(githuburl\s*:\s*['"]?)\(auto fill by runme\.js\)/, "$1" + github.url);
-  widgetSrc = widgetSrc.replace(/(testurl\s*:\s*['"]?)\(auto fill by runme\.js\)/, "$1" + widgetUrl);
+  // widgetSrc = widgetSrc.replace(reUrl, "$1" + github.rawurl);
+  // widgetSrc = widgetSrc.replace(/(fiddleurl\s*:\s*['"]?)\(auto fill by runme\.js\)/, "$1" + editUrl);
+  // widgetSrc = widgetSrc.replace(/(githuburl\s*:\s*['"]?)\(auto fill by runme\.js\)/, "$1" + github.url);
+  // widgetSrc = widgetSrc.replace(/(testurl\s*:\s*['"]?)\(auto fill by runme\.js\)/, "$1" + widgetUrl);
   
   // rewrite the javascript
   //fs.writeFileSync('widget.js', widgetSrc);
