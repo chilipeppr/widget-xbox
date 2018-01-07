@@ -1647,7 +1647,7 @@ var getAllUrls = function() {
         // http://83c03ab3f6f9431aa813882decbfc4aa.vfs.cloud9.us-west-2.amazonaws.com/widget.html
         ret.testNoSsl = 'http://' + process.env.C9_PID + '.vfs.cloud9.' + region + '.amazonaws.com/widget.html';
         // http://83c03ab3f6f9431aa813882decbfc4aa.vfs.cloud9.us-west-2.amazonaws.com/
-        ret.runmeHomepage = 'http://' + process.env.C9_PID + '.vfs.cloud9.' + region + '.amazonaws.com/';
+        ret.runmeHomepage = 'https://' + process.env.C9_PID + '.vfs.cloud9.' + region + '.amazonaws.com/';
     } else {
         // we are in original cloud9
         // var ret.edit = 'http://' +
@@ -1662,7 +1662,7 @@ var getAllUrls = function() {
         ret.testNoSsl = 'http://' + process.env.C9_PROJECT +
             '-' + process.env.C9_USER + '.c9users.io/widget.html';
         // https://widget-xbox-chilipeppr.c9users.io/
-        ret.runmeHomepage = 'http://' + process.env.C9_PROJECT +
+        ret.runmeHomepage = 'https://' + process.env.C9_PROJECT +
             '-' + process.env.C9_USER + '.c9users.io/';
     }
     
@@ -1714,6 +1714,22 @@ var whichAwsRegion = function() {
     
     return region;
 }
+
+var triggerStorageOfCredentials = function() {
+  // as long as we run this cmd, the first time you enter your user/pass it will store it
+  // so each time you run this, it won't re-ask you
+  // git config credential.helper store
+  var childproc = require('child_process');
+  var cmd = 'git config credential.helper store';
+  var stdout = "";
+  try {
+      stdout = childproc.execSync(cmd, { encoding: 'utf8' });
+  } catch(e) {
+      console.warn("Could not execute cmd line:", cmd);
+  }
+}
+
+triggerStorageOfCredentials();
 
 var urls = getAllUrls();
 console.log("urls:", urls);
