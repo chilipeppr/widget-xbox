@@ -54,6 +54,7 @@ var getAllUrls = function() {
         github: "",
         test: "",
         testNoSsl: "",
+        runmeHomepage: "",
     }
     
     var git = getGithubUrl();
@@ -79,20 +80,29 @@ var getAllUrls = function() {
     */
     if (isAwsVersion()) {
         // we are in AWS
-        
+        // https://us-west-2.console.aws.amazon.com/cloud9/ide/83c03ab3f6f9431aa813882decbfc4aa
+        ret.edit = 'https://us-west-2.console.aws.amazon.com/cloud9/ide/' + process.env.C9_PID;
+        // https://vfs.cloud9.us-west-2.amazonaws.com/vfs/83c03ab3f6f9431aa813882decbfc4aa/preview/widget-xbox/widget.html
+        ret.test = 'https://vfs.cloud9.us-west-2.amazonaws.com/vfs/' + 
+            process.env.C9_PID + '/preview/' + 
+            process.env.C9_PROJECT + '/widget.html';
+        // http://83c03ab3f6f9431aa813882decbfc4aa.vfs.cloud9.us-west-2.amazonaws.com/widget.html
+        ret.testNoSsl = 'http://' + process.env.C9_PID + '.vfs.cloud9.us-west-2.amazonaws.com/widget.html';
+        // http://83c03ab3f6f9431aa813882decbfc4aa.vfs.cloud9.us-west-2.amazonaws.com/
+        ret.runmeHomepage = 'http://' + process.env.C9_PID + '.vfs.cloud9.us-west-2.amazonaws.com/';
     } else {
         // we are in original cloud9
         // var ret.edit = 'http://' +
         //     process.env.C9_PROJECT + '-' + process.env.C9_USER +
         //     '.c9users.io/widget.html';
+        ret.edit = 'http://ide.c9.io/' +
+            process.env.C9_USER + '/' +
+            process.env.C9_PROJECT;
         ret.test = 'https://preview.c9users.io/' +
             process.env.C9_USER + '/' +
             process.env.C9_PROJECT + '/widget.html';
         ret.testNoSsl = 'http://' + process.env.C9_PROJECT +
             '-' + process.env.C9_USER + '.c9users.io/widget.html';
-        ret.edit = 'http://ide.c9.io/' +
-            process.env.C9_USER + '/' +
-            process.env.C9_PROJECT;
     }
     
     return ret;
