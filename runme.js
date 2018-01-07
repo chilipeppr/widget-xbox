@@ -1543,31 +1543,46 @@ var getMainPage = function() {
 
 var getGithubUrl = function(callback) {
 
-  // new approach. use the command line from git
-  // git config --get remote.origin.url
-  
-  var childproc = require('child_process');
-  var cmd = 'git config --get remote.origin.url';
-
-  var stdout = childproc.execSync(cmd, { encoding: 'utf8' });
-  //console.log("Got the following Github URL:", stdout);
-
-  var re = /.*github.com:/i;
-  var url = stdout.replace(re, "");
-  url = url.replace(/.git[\s\S]*$/i, ""); // remove end
-  
-  // prepend with clean githut url
-  url = "http://github.com/" + url;
-  
-  var rawurl = url.replace(/\/github.com\//i, "/raw.githubusercontent.com/");
-  rawurl += '/master/auto-generated-widget.html';
-  
-  var ret = {
-    url: url,
-    rawurl : rawurl
-  };
-  
-  //console.log("ret:", ret);
-  return ret;
+    // new approach. use the command line from git
+    // git config --get remote.origin.url
+    
+    var childproc = require('child_process');
+    var cmd = 'git config --get remote.origin.url';
+    
+    var stdout = childproc.execSync(cmd, { encoding: 'utf8' });
+    //console.log("Got the following Github URL:", stdout);
+    
+    // see what format we got back
+    if (stdout.match(/\.git/)) {
+        
+        // format is git@github.com:chilipeppr/widget-xbox.git
+        var re = /.*github.com:/i;
+        var url = stdout.replace(re, "");
+        url = url.replace(/.git[\s\S]*$/i, ""); // remove end
+        
+        // prepend with clean githut url
+        url = "http://github.com/" + url;
+        
+        var rawurl = url.replace(/\/github.com\//i, "/raw.githubusercontent.com/");
+        rawurl += '/master/auto-generated-widget.html';
+        
+    } else {
+        
+        // format is https://github.com/chilipeppr/widget-xbox
+        console.log("format has no .git in it");
+        url = stdout;
+        url = url.replace(/[\s]*$/i, ""); // remove end
+        console.log(url);
+        var rawurl = url.replace(/\/github.com\//i, "/raw.githubusercontent.com/");
+        rawurl += '/master/auto-generated-widget.html';
+    }
+    var ret = {
+        giturl: stdout,
+        url: url,
+        rawurl : rawurl
+    };
+    
+    //console.log("ret:", ret);
+    return ret;
     
 }
