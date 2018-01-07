@@ -33,7 +33,7 @@ $("body").append('<' + 'div id="myDivWidgetXbox"><' + '/div>');
 
 chilipeppr.load(
   "#myDivWidgetXbox",
-  "https://raw.githubusercontent.com/chilipeppr/widget-xbox/master/auto-generated-widget.html",
+  "http://raw.githubusercontent.com/chilipeppr/widget-xbox/master/auto-generated-widget.html",
   function() {
     // Callback after widget loaded into #myDivWidgetXbox
     // Now use require.js to get reference to instantiated widget
