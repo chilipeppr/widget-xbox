@@ -78,18 +78,22 @@ var getAllUrls = function() {
     Test URL No SSL	
 
     */
-    if (isAwsVersion()) {
+    if (isAwsEnvironment()) {
         // we are in AWS
+        
+        // get region
+        var region = whichAwsRegion();
+        
         // https://us-west-2.console.aws.amazon.com/cloud9/ide/83c03ab3f6f9431aa813882decbfc4aa
-        ret.edit = 'https://us-west-2.console.aws.amazon.com/cloud9/ide/' + process.env.C9_PID;
+        ret.edit = 'https://' + region + '.console.aws.amazon.com/cloud9/ide/' + process.env.C9_PID;
         // https://vfs.cloud9.us-west-2.amazonaws.com/vfs/83c03ab3f6f9431aa813882decbfc4aa/preview/widget-xbox/widget.html
-        ret.test = 'https://vfs.cloud9.us-west-2.amazonaws.com/vfs/' + 
+        ret.test = 'https://vfs.cloud9.' + region + '.amazonaws.com/vfs/' + 
             process.env.C9_PID + '/preview/' + 
             process.env.C9_PROJECT + '/widget.html';
         // http://83c03ab3f6f9431aa813882decbfc4aa.vfs.cloud9.us-west-2.amazonaws.com/widget.html
-        ret.testNoSsl = 'http://' + process.env.C9_PID + '.vfs.cloud9.us-west-2.amazonaws.com/widget.html';
+        ret.testNoSsl = 'http://' + process.env.C9_PID + '.vfs.cloud9.' + region + '.amazonaws.com/widget.html';
         // http://83c03ab3f6f9431aa813882decbfc4aa.vfs.cloud9.us-west-2.amazonaws.com/
-        ret.runmeHomepage = 'http://' + process.env.C9_PID + '.vfs.cloud9.us-west-2.amazonaws.com/';
+        ret.runmeHomepage = 'http://' + process.env.C9_PID + '.vfs.cloud9.' + region + '.amazonaws.com/';
     } else {
         // we are in original cloud9
         // var ret.edit = 'http://' +
@@ -103,12 +107,15 @@ var getAllUrls = function() {
             process.env.C9_PROJECT + '/widget.html';
         ret.testNoSsl = 'http://' + process.env.C9_PROJECT +
             '-' + process.env.C9_USER + '.c9users.io/widget.html';
+        // https://widget-xbox-chilipeppr.c9users.io/
+        ret.runmeHomepage = 'http://' + process.env.C9_PROJECT +
+            '-' + process.env.C9_USER + '.c9users.io/';
     }
     
     return ret;
 }
 
-var isAwsVersion = function() {
+var isAwsEnvironment = function() {
     
     // AWS cloud9 instances have AWS environment variables, so we should be able to use that
     // to distinguish from original cloud9 to AWS's version
@@ -125,11 +132,43 @@ var isAwsVersion = function() {
     }
 }
 
+var whichAwsRegion = function() {
+    
+    // we can figure out the aws region by looking at the arn value
+    // arn:aws:cloudformation:us-west-2:381976811276:stack/aws-cloud9-workspace-tinyg-820f668385554da2bde72957a9078cdc/e0c47e00-f3ea-11e7-9ccf-503aca41a08d
+    // arn:aws:cloudformation:us-west-2:381976811276:stack/aws-cloud9-widget-xbox-83c03ab3f6f9431aa813882decbfc4aa/c4603630-f18a-11e7-a76d-50a686fc37d2
+    // arn:aws:cloudformation:us-east-1:381976811276:stack/awseb-e-xykh2cx2kq-stack/759041b0-12ac-11e3-9b45-50e24162947c
+    // arn:aws:cloudformation:us-east-2:381976811276:stack/aws-cloud9-widget-eagle-da906241afb9471ba097583389a735a0/d1fbd9d0-f3f5-11e7-97bb-500cef930c1e
+
+    var childproc = require('child_process');
+    var cmd = 'aws ec2 describe-instances';
+    var stdout = "";
+    var region = "";
+    try {
+        stdout = childproc.execSync(cmd, { encoding: 'utf8' });
+        // console.log("whichAwsRegion:", stdout);
+        // if we get here, we got good execution of aws command
+        if (stdout.match(/arn:aws:cloudformation:(.*?):/)) {
+            // found an arn with a region
+            region = RegExp.$1;
+        } else {
+            console.log("could not find region");
+        }
+    } catch(e) {
+        console.warn("Could not execute cmd line:", cmd);
+    }
+    
+    return region;
+}
+
 // var url = getGithubUrl();
 // console.log("url", url);
 
 // var isAws = isAwsVersion();
 // console.log("isAws:", isAws);
+
+// var region = whichAwsRegion();
+// console.log("region:", region);
 
 var urls = getAllUrls();
 console.log("urls:", urls);
