@@ -46,8 +46,8 @@ http.createServer(function(req, res) {
     notes += "<p>Generated a new auto-generated-widget.html file...</p>";
     //pushToGithub();
     //pushToGithubSync();
-    pushToGithubAsync();
-    notes += "<p>Pushed updates to Github...</p>";
+    //pushToGithubAsync();
+    //notes += "<p>Pushed updates to Github...</p>";
 
     //html = html + htmlDocs;
     var finalHtml = htmlDocs.replace(/<!-- pre-notes -->/, notes);
