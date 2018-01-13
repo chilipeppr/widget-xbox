@@ -139,6 +139,9 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             
             this.setupGamepad();
             this.setupBody();
+            
+            chilipeppr.subscribe("/com-chilipeppr-interface-cnccontroller/plannerpause", this, this.onPlannerPause);
+            chilipeppr.subscribe("/com-chilipeppr-interface-cnccontroller/plannerresume", this, this.onPlannerResume);
 
             console.log("I am done being initted.");
         },
@@ -211,7 +214,6 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		        // Got B button for Feedhold
         			    that.sendGcode("!");
         		        break;
-        		        
         		    case 'FACE_4':
         		        // Got coolant toggle
             			// See what we sent last time and send other cmd
@@ -223,15 +225,12 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             				that.lastCoolantCmd = "M7";
             			}
         		        break;
-        		        
         		    case 'START_FORWARD':
         		        // Got start button.  enable/disable jogging
         		        that.joggingEnabled = !that.joggingEnabled;
-        		        
         		        chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
         		            "Xbox Controller Button Down", "Toggle Jog Enable: " + that.joggingEnabled, 500, true);
         		        break;
-        		        
         		    default:
         		        chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
         		            "Xbox Controller Button Down", "Control: " + e.control, 500, true);
@@ -282,12 +281,58 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         	}
         },
         
+        sendCtr: 0,
         stickJog: function(xVal, yVal) {
-            console.log(xVal + " " + yVal);
+            //console.log(xVal + " " + yVal);
+            if (!this.isPausedByPlanner) {
+                var feedRt = 100;
+                var xJog = 0;
+                var yJog = 0;
+                
+                var gcode = "G91 G0";
+                
+                gcode += " X" + xJog;
+                gcode += " Y" + yJog;
+                gcode += " F" + feedRt;
+                
+                gcode += "\nG90\n";
+                var jsonSend = {
+                    D: gcode,
+                    Id: "jog" + this.sendCtr
+                };
+                console.log(jsonSend);
+                chilipeppr.publish("/com-chilipeppr-widget-serialport/jsonSend", jsonSend);
+                this.sendCtr++;
+                if (this.sendCtr > 999999) this.sendCtr = 0;
+            } else {
+                console.log("Skip jog send, paused by planner");
+            }
         },
         
         stickJogStop: function() {
-            console.log("Send Gcode Feedhold");  
+            console.log("Send Gcode Feedhold and Flush");
+            chilipeppr.publish("/com-chilipeppr-widget-serialport/send", "!\n%\n");
+            setTimeout(function () {
+                chilipeppr.publish("/com-chilipeppr-widget-serialport/send", "%\n");
+            }, 200);
+        },
+        
+        isPausedByPlanner: false, // keeps track of whether we've been told to pause sending by the planner buffer
+        onPlannerPause: function () {
+            console.log("xyz-onPlannerPause. being asked to pause.");
+            if (!this.isPausedByPlanner) {
+                this.isPausedByPlanner = true;
+            } else {
+                console.log("got planner pause, but we're already paused");
+            }
+        },
+        onPlannerResume: function () {
+            console.log("xyz-onPlannerResume. being asked to resume.");
+            if (this.isPausedByPlanner) {
+                this.isPausedByPlanner = false;
+            } else {
+                console.log("got planner resume, but we're already resumed which is weird.");
+            }
         },
         
         /**
