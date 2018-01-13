@@ -250,10 +250,9 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		    that.jogStarted = true;
         		    that.gpIndex = e.gamepad.index;
         		    
-        		    console.log(" e.axis changed to value e.value for gamepad e.gamepad. e:", e);
-        		    chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
-        		        "State", "X: " + e.gamepad.state['LEFT_STICK_X'] + " Y: " + e.gamepad.state['LEFT_STICK_Y'], 500, true);
-        		        //"Xbox Controller Axis Changed", "Axis: " + e.axis + ", Value:" + e.value, 500, true); 
+        		    //console.log(" e.axis changed to value e.value for gamepad e.gamepad. e:", e);
+        		    //chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
+        		        //"State", "X: " + e.gamepad.state['LEFT_STICK_X'] + " Y: " + e.gamepad.state['LEFT_STICK_Y'], 500, true);
         		}
         	});
         
@@ -301,7 +300,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
                     Id: "jog" + this.sendCtr
                 };
                 console.log(jsonSend);
-                chilipeppr.publish("/com-chilipeppr-widget-serialport/jsonSend", jsonSend);
+                //chilipeppr.publish("/com-chilipeppr-widget-serialport/jsonSend", jsonSend);
                 this.sendCtr++;
                 if (this.sendCtr > 999999) this.sendCtr = 0;
             } else {
