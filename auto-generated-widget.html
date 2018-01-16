@@ -128,7 +128,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
          */
         publish: {
             // Define a key:value pair here as strings to document what signals you publish.
-            '/onExampleGenerate': 'Example: Publish this signal when we go to generate gcode.'
+            
         },
         /**
          * Define the subscribe signals that this widget/element owns or defines so that
@@ -147,6 +147,10 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             // Define a key:value pair here as strings to document what signals you publish to
             // that are owned by foreign/other widgets.
             // '/jsonSend': 'Example: We send Gcode to the serial port widget to do stuff with the CNC controller.'
+            '/com-chilipeppr-elem-flashmsg/flashmsg': 'Used to notify the operator of certain events.',
+            '/com-chilipeppr-widget-serialport/jsonSend': 'Used to send Gcode to the controller.',
+            '/com-chilipeppr-widget-serialport/send': 'Used to send Gcode to the controller.'
+            
         },
         /**
          * Document the foreign subscribe signals, i.e. signals owned by other widgets
@@ -156,6 +160,8 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             // Define a key:value pair here as strings to document what signals you subscribe to
             // that are owned by foreign/other widgets.
             // '/com-chilipeppr-elem-dragdrop/ondropped': 'Example: We subscribe to this signal at a higher priority to intercept the signal. We do not let it propagate by returning false.'
+            '/com-chilipeppr-interface-cnccontroller/plannerpause': 'Subscribed to be notified when the planner buffer is fill so we can stop sending jog commands.',
+            '/com-chilipeppr-interface-cnccontroller/plannerresume': 'Subscribed to be notified when the planner buffer has room for more jog commands.'
         },
         /**
          * All widgets should have an init method. It should be run by the
@@ -195,6 +201,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
          
         joggingEnabled: false,
         jogStarted: false,
+        zjogStarted: false,
         gpIndex: 0,
          
         setupGamepad: function() {
@@ -222,13 +229,21 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		if (device.id.match(/xbox/i)) {
         		    console.log("found xbox controller;");
         		    chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
-        		    "Xbox Controller Found", "Device: " + JSON.stringify(device, null, "\t"), 500, false); 
+        		    "Xbox Controller Found", "Device: " + device.index, 500, false); 
+        		    if ($('#com-chilipeppr-ws-xbox').hasClass("hidden")) {
+                        $('#com-chilipeppr-ws-xbox').removeClass("hidden");
+                        $('#com-chilipeppr-ws-menu .xbox-button').addClass("active");
+                    }
         		}
         	});
         
         	gamepad.bind(Gamepad.Event.DISCONNECTED, function(device) {
         		// gamepad disconnected
         		console.log("gamepad disconnected. device:", device);
+    		    if (!$('#com-chilipeppr-ws-xbox').hasClass("hidden")) {
+                    $('#com-chilipeppr-ws-xbox').addClass("hidden");
+                    $('#com-chilipeppr-ws-menu .xbox-button').removeClass("active");
+                }
         	});
         
         	gamepad.bind(Gamepad.Event.UNSUPPORTED, function(device) {
@@ -276,9 +291,13 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         	gamepad.bind(Gamepad.Event.AXIS_CHANGED, function(e) {
         		// e.axis changed to value e.value for gamepad e.gamepad
         		// using a big dead-zone.  my controller's a bit wallered out.
-        		if (e.axis.includes('LEFT_STICK') && Math.abs(e.value) > 0.4 && that.joggingEnabled && !that.jogStarted) {
+        		if (e.axis.includes('LEFT_STICK') && Math.abs(e.value) > 0.4 && that.joggingEnabled && !that.zjogStarted && !that.jogStarted) {
         		    console.log('Start Jog');
         		    that.jogStarted = true;
+        		    that.gpIndex = e.gamepad.index;
+        		} else if ( (e.axis = 'RIGHT_STICK_Y') && Math.abs(e.value) > 0.4 && that.joggingEnabled && !that.zjogStarted && !that.jogStarted) {
+        		    console.log('Start zJog');
+        		    that.zjogStarted = true;
         		    that.gpIndex = e.gamepad.index;
         		}
         	});
@@ -295,6 +314,18 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
 	        	    } else {
 	        	        if (this.slowDown == 0) {
 	        	            that.stickJog(gamepads[that.gpIndex].state['LEFT_STICK_X'], gamepads[that.gpIndex].state['LEFT_STICK_Y']);
+	        	        }
+	        	        this.slowDown = (this.slowDown > 5) ? 0 : this.slowDown + 1;
+	        	    }
+	        	} else if (that.zjogStarted) {
+	        	    if (Math.abs(gamepads[that.gpIndex].state['RIGHT_STICK_Y']) < 0.3) {
+	        	        console.log('Stop zJog');
+	        	        that.zjogStarted = false;
+	        	        this.slowDown = 0;
+	        	        that.stickJogStop();
+	        	    } else {
+	        	        if (this.slowDown == 0) {
+	        	            that.zstickJog(gamepads[that.gpIndex].state['RIGHT_STICK_Y']);
 	        	        }
 	        	        this.slowDown = (this.slowDown > 5) ? 0 : this.slowDown + 1;
 	        	    }
@@ -327,6 +358,29 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
                 gcode += " F" + feedRt;
                 gcode += " X" + xJog.toFixed(3);
                 gcode += " Y" + yJog.toFixed(3);
+                gcode += "\nG90\n";
+                var jsonSend = {
+                    D: gcode,
+                    Id: "jog" + this.sendCtr
+                };
+                
+                //console.log(jsonSend);
+                chilipeppr.publish("/com-chilipeppr-widget-serialport/jsonSend", jsonSend);
+                this.sendCtr++;
+                if (this.sendCtr > 999999) this.sendCtr = 0;
+            } else {
+                console.log("Skip jog send, paused by planner");
+            }
+        },
+        zstickJog: function(zVal) {
+            //console.log(xVal + " " + yVal);
+            if (!this.isPausedByPlanner) {
+                var feedRt = Math.floor( Math.abs( zVal ) * this.maxFeed );
+                var zJog = -1.0 * zVal * this.maxDist;
+                
+                var gcode = "G91 G1";
+                gcode += " F" + feedRt;
+                gcode += " Z" + zJog.toFixed(3);
                 gcode += "\nG90\n";
                 var jsonSend = {
                     D: gcode,
