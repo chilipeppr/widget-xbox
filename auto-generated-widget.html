@@ -276,7 +276,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         	gamepad.bind(Gamepad.Event.AXIS_CHANGED, function(e) {
         		// e.axis changed to value e.value for gamepad e.gamepad
         		// using a .25 dead-zone.  my controller's a bit wallered out.
-        		if (e.axis.includes('LEFT_STICK') && Math.abs(e.value) > 0.3 && that.joggingEnabled && !that.jogStarted) {
+        		if (e.axis.includes('LEFT_STICK') && Math.abs(e.value) > 0.4 && that.joggingEnabled && !that.jogStarted) {
         		    console.log('Start Jog');
         		    that.jogStarted = true;
         		    that.gpIndex = e.gamepad.index;
@@ -290,7 +290,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
 	        gamepad.bind(Gamepad.Event.TICK, function(gamepads) {
 	        	// gamepads were updated (around 60 times a second)
 	        	if (that.jogStarted) {
-	        	    if (Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_X']) < 0.25 && Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_Y']) < 0.25) {
+	        	    if (Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_X']) < 0.3 && Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_Y']) < 0.3) {
 	        	        console.log('Stop Jog');
 	        	        that.jogStarted = false;
 	        	        that.stickJogStop();
