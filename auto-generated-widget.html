@@ -313,13 +313,13 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         
         sendCtr: 0,
         maxFeed: 1000,
-        maxDist: 5,
+        maxDist: 1,
         isPausedByPlanner: false, // keeps track of whether we've been told to pause sending by the planner buffer
         stickJog: function(xVal, yVal) {
             //console.log(xVal + " " + yVal);
             if (!this.isPausedByPlanner) {
                 var feedRt = Math.floor( Math.sqrt( Math.pow(xVal, 2) + Math.pow(yVal, 2) ) * this.maxFeed );
-                var xJog = xVal * this.maxDist;
+                var xJog = -1.0 * xVal * this.maxDist;
                 var yJog = yVal * this.maxDist;
                 
                 var gcode = "G91 G0";
