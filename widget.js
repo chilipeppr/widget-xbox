@@ -283,6 +283,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         sendCtr: 0,
         maxFeed: 1000,
         maxDist: 5,
+        isPausedByPlanner: false, // keeps track of whether we've been told to pause sending by the planner buffer
         stickJog: function(xVal, yVal) {
             //console.log(xVal + " " + yVal);
             if (!this.isPausedByPlanner) {
@@ -318,7 +319,6 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             }, 200);
         },
         
-        isPausedByPlanner: false, // keeps track of whether we've been told to pause sending by the planner buffer
         onPlannerPause: function () {
             console.log("xyz-onPlannerPause. being asked to pause.");
             if (!this.isPausedByPlanner) {
