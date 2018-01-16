@@ -334,7 +334,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
                     Id: "jog" + this.sendCtr
                 };
                 console.log(jsonSend);
-                //chilipeppr.publish("/com-chilipeppr-widget-serialport/jsonSend", jsonSend);
+                chilipeppr.publish("/com-chilipeppr-widget-serialport/jsonSend", jsonSend);
                 this.sendCtr++;
                 if (this.sendCtr > 999999) this.sendCtr = 0;
             } else {
