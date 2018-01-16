@@ -319,8 +319,8 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             //console.log(xVal + " " + yVal);
             if (!this.isPausedByPlanner) {
                 var feedRt = Math.floor( Math.sqrt( Math.pow(xVal, 2) + Math.pow(yVal, 2) ) * this.maxFeed );
-                var xJog = -1.0 * xVal * this.maxDist;
-                var yJog = yVal * this.maxDist;
+                var xJog = xVal * this.maxDist;
+                var yJog = -1.0 * yVal * this.maxDist;
                 
                 var gcode = "G91 G0";
                 
