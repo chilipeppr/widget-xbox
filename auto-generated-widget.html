@@ -275,19 +275,15 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         
         	gamepad.bind(Gamepad.Event.AXIS_CHANGED, function(e) {
         		// e.axis changed to value e.value for gamepad e.gamepad
-        		// using a .25 dead-zone.  my controller's a bit wallered out.
+        		// using a big dead-zone.  my controller's a bit wallered out.
         		if (e.axis.includes('LEFT_STICK') && Math.abs(e.value) > 0.4 && that.joggingEnabled && !that.jogStarted) {
         		    console.log('Start Jog');
         		    that.jogStarted = true;
         		    that.gpIndex = e.gamepad.index;
-        		    
-        		    //console.log(" e.axis changed to value e.value for gamepad e.gamepad. e:", e);
-        		    //chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
-        		        //"State", "X: " + e.gamepad.state['LEFT_STICK_X'] + " Y: " + e.gamepad.state['LEFT_STICK_Y'], 500, true);
         		}
         	});
         
-            slowDown: 0;
+            slowDown: 0;  //60hz is just too fast
 	        gamepad.bind(Gamepad.Event.TICK, function(gamepads) {
 	        	// gamepads were updated (around 60 times a second)
 	        	if (that.jogStarted) {
@@ -318,7 +314,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         
         sendCtr: 0,
         maxFeed: 1000,
-        maxDist: 4,
+        maxDist: 5,
         isPausedByPlanner: false, // keeps track of whether we've been told to pause sending by the planner buffer
         stickJog: function(xVal, yVal) {
             //console.log(xVal + " " + yVal);
@@ -328,17 +324,16 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
                 var yJog = -1.0 * yVal * this.maxDist;
                 
                 var gcode = "G91 G0";
-                
                 gcode += " F" + feedRt;
                 gcode += " X" + xJog.toFixed(3);
                 gcode += " Y" + yJog.toFixed(3);
-                
                 gcode += "\nG90\n";
                 var jsonSend = {
                     D: gcode,
                     Id: "jog" + this.sendCtr
                 };
-                console.log(jsonSend);
+                
+                //console.log(jsonSend);
                 chilipeppr.publish("/com-chilipeppr-widget-serialport/jsonSend", jsonSend);
                 this.sendCtr++;
                 if (this.sendCtr > 999999) this.sendCtr = 0;
