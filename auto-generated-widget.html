@@ -287,15 +287,20 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		}
         	});
         
+            slowDown: 0;
 	        gamepad.bind(Gamepad.Event.TICK, function(gamepads) {
 	        	// gamepads were updated (around 60 times a second)
 	        	if (that.jogStarted) {
 	        	    if (Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_X']) < 0.3 && Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_Y']) < 0.3) {
 	        	        console.log('Stop Jog');
 	        	        that.jogStarted = false;
+	        	        this.slowDown = 0;
 	        	        that.stickJogStop();
 	        	    } else {
-	        	        that.stickJog(gamepads[that.gpIndex].state['LEFT_STICK_X'], gamepads[that.gpIndex].state['LEFT_STICK_Y']);
+	        	        if (this.slowDown == 0) {
+	        	            that.stickJog(gamepads[that.gpIndex].state['LEFT_STICK_X'], gamepads[that.gpIndex].state['LEFT_STICK_Y']);
+	        	        }
+	        	        this.slowDown = (this.slowDown > 5) ? 0 : this.slowDown + 1;
 	        	    }
 	        	}
 	        });
@@ -313,7 +318,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         
         sendCtr: 0,
         maxFeed: 1000,
-        maxDist: 1,
+        maxDist: 4,
         isPausedByPlanner: false, // keeps track of whether we've been told to pause sending by the planner buffer
         stickJog: function(xVal, yVal) {
             //console.log(xVal + " " + yVal);
