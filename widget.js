@@ -292,7 +292,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
                 var xJog = xVal * this.maxDist;
                 var yJog = -1.0 * yVal * this.maxDist;
                 
-                var gcode = "G91 G0";
+                var gcode = "G91 G1";
                 gcode += " F" + feedRt;
                 gcode += " X" + xJog.toFixed(3);
                 gcode += " Y" + yJog.toFixed(3);
