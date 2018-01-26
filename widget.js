@@ -207,7 +207,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         	});
         
         	gamepad.bind(Gamepad.Event.DISCONNECTED, function(device) {
-        		// gamepad disconnected
+        		// gamepad disconnected, hide the widget
         		console.log("gamepad disconnected. device:", device);
     		    if (!$('#com-chilipeppr-ws-xbox').hasClass("hidden")) {
                     $('#com-chilipeppr-ws-xbox').addClass("hidden");
@@ -230,7 +230,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         			    that.sendGcode("!");
         		        break;
         		    case 'FACE_4':
-        		        // Got coolant toggle
+        		        // Got Y button for coolant toggle
             			// See what we sent last time and send other cmd
             			if (that.lastCoolantCmd == "M7") {
             				that.sendGcode("M9");
@@ -271,17 +271,21 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		}
         	});
         
-            slowDown: 0;  //60hz is just too fast
+            slowDown: -1;  //60hz is just too fast
 	        gamepad.bind(Gamepad.Event.TICK, function(gamepads) {
 	        	// gamepads were updated (around 60 times a second)
 	        	if (that.jogStarted) {
 	        	    if (Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_X']) < 0.3 && Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_Y']) < 0.3) {
 	        	        console.log('Stop Jog');
 	        	        that.jogStarted = false;
-	        	        this.slowDown = 0;
+	        	        this.slowDown = -1;
 	        	        that.stickJogStop();
 	        	    } else {
 	        	        if (this.slowDown == 0) {
+	        	            that.stickJog(gamepads[that.gpIndex].state['LEFT_STICK_X'], gamepads[that.gpIndex].state['LEFT_STICK_Y']);
+	        	        } else if (this.slowDown == -1) {
+	        	            that.stickJog(gamepads[that.gpIndex].state['LEFT_STICK_X'], gamepads[that.gpIndex].state['LEFT_STICK_Y']);
+	        	            that.stickJog(gamepads[that.gpIndex].state['LEFT_STICK_X'], gamepads[that.gpIndex].state['LEFT_STICK_Y']);
 	        	            that.stickJog(gamepads[that.gpIndex].state['LEFT_STICK_X'], gamepads[that.gpIndex].state['LEFT_STICK_Y']);
 	        	        }
 	        	        this.slowDown = (this.slowDown > 5) ? 0 : this.slowDown + 1;
@@ -290,10 +294,14 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
 	        	    if (Math.abs(gamepads[that.gpIndex].state['RIGHT_STICK_Y']) < 0.3) {
 	        	        console.log('Stop zJog');
 	        	        that.zjogStarted = false;
-	        	        this.slowDown = 0;
+	        	        this.slowDown = -1;
 	        	        that.stickJogStop();
 	        	    } else {
 	        	        if (this.slowDown == 0) {
+	        	            that.zstickJog(gamepads[that.gpIndex].state['RIGHT_STICK_Y']);
+	        	        } else if (this.slowDown == -1) {
+	        	            that.zstickJog(gamepads[that.gpIndex].state['RIGHT_STICK_Y']);
+	        	            that.zstickJog(gamepads[that.gpIndex].state['RIGHT_STICK_Y']);
 	        	            that.zstickJog(gamepads[that.gpIndex].state['RIGHT_STICK_Y']);
 	        	        }
 	        	        this.slowDown = (this.slowDown > 5) ? 0 : this.slowDown + 1;
@@ -304,11 +312,6 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             if (!gamepad.init()) {
         		// Your browser does not support gamepads, get the latest Google Chrome or Firefox
         		console.log("Your browser does not support gamepads, get the latest Google Chrome or Firefox");
-        	} else {
-        	   // setTimeout(function() {
-            // 	    chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
-            // 		    "Xbox Controller Initted", "Your browser supports Gamepad controllers.", null, 3000, true); 
-        	   // }, 2000);
         	}
         },
         
@@ -320,8 +323,8 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             //console.log(xVal + " " + yVal);
             if (!this.isPausedByPlanner) {
                 var feedRt = Math.floor( Math.sqrt( Math.pow(xVal, 2) + Math.pow(yVal, 2) ) * this.maxFeed );
-                var xJog = xVal * this.maxDist;
-                var yJog = -1.0 * yVal * this.maxDist;
+                var xJog = (Math.abs(xVal) > 0.3) ? ( xVal * this.maxDist ) : 0;
+                var yJog = (Math.abs(yVal) > 0.3) ? (-1.0 * yVal * this.maxDist) : 0;
                 
                 var gcode = "G91 G1";
                 gcode += " F" + feedRt;
@@ -344,8 +347,8 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         zstickJog: function(zVal) {
             //console.log(xVal + " " + yVal);
             if (!this.isPausedByPlanner) {
-                var feedRt = Math.floor( Math.abs( zVal ) * this.maxFeed );
-                var zJog = -1.0 * zVal * this.maxDist;
+                var feedRt = Math.floor( Math.abs( zVal ) * this.maxFeed / 4 );
+                var zJog = -1.0 * zVal * this.maxDist / 4;
                 
                 var gcode = "G91 G1";
                 gcode += " F" + feedRt;
