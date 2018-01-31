@@ -350,7 +350,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         isPausedByPlanner: false, // keeps track of whether we've been told to pause sending by the planner buffer
         stickJog: function(xVal, yVal) {
             //console.log(xVal + " " + yVal);
-            var maxFeed = this.options.maxFeed;
+            var maxFeed = this.options.RateXY;
             
             if (!this.isPausedByPlanner) {
                 var feedRt = Math.floor( Math.sqrt( Math.pow(xVal, 2) + Math.pow(yVal, 2) ) * maxFeed );
@@ -377,7 +377,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         },
         zstickJog: function(zVal) {
             //console.log(xVal + " " + yVal);
-            var maxFeed = this.options.maxFeed;
+            var maxFeed = this.options.RateZ;
             
             if (!this.isPausedByPlanner) {
                 var feedRt = Math.floor( Math.abs( zVal ) * maxFeed / 4 );
