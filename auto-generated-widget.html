@@ -302,21 +302,17 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		}
         	});
         
-            slowDown: -1;  //60hz is just too fast
+            slowDown: 0;  //60hz is just too fast
 	        gamepad.bind(Gamepad.Event.TICK, function(gamepads) {
 	        	// gamepads were updated (around 60 times a second)
 	        	if (that.jogStarted) {
 	        	    if (Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_X']) < 0.3 && Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_Y']) < 0.3) {
 	        	        console.log('Stop Jog');
 	        	        that.jogStarted = false;
-	        	        this.slowDown = -1;
+	        	        this.slowDown = 0;
 	        	        that.stickJogStop();
 	        	    } else {
 	        	        if (this.slowDown == 0) {
-	        	            that.stickJog(gamepads[that.gpIndex].state['LEFT_STICK_X'], gamepads[that.gpIndex].state['LEFT_STICK_Y']);
-	        	        } else if (this.slowDown == -1) {
-	        	            that.stickJog(gamepads[that.gpIndex].state['LEFT_STICK_X'], gamepads[that.gpIndex].state['LEFT_STICK_Y']);
-	        	            that.stickJog(gamepads[that.gpIndex].state['LEFT_STICK_X'], gamepads[that.gpIndex].state['LEFT_STICK_Y']);
 	        	            that.stickJog(gamepads[that.gpIndex].state['LEFT_STICK_X'], gamepads[that.gpIndex].state['LEFT_STICK_Y']);
 	        	        }
 	        	        this.slowDown = (this.slowDown > 5) ? 0 : this.slowDown + 1;
@@ -325,14 +321,10 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
 	        	    if (Math.abs(gamepads[that.gpIndex].state['RIGHT_STICK_Y']) < 0.3) {
 	        	        console.log('Stop zJog');
 	        	        that.zjogStarted = false;
-	        	        this.slowDown = -1;
+	        	        this.slowDown = 0;
 	        	        that.stickJogStop();
 	        	    } else {
 	        	        if (this.slowDown == 0) {
-	        	            that.zstickJog(gamepads[that.gpIndex].state['RIGHT_STICK_Y']);
-	        	        } else if (this.slowDown == -1) {
-	        	            that.zstickJog(gamepads[that.gpIndex].state['RIGHT_STICK_Y']);
-	        	            that.zstickJog(gamepads[that.gpIndex].state['RIGHT_STICK_Y']);
 	        	            that.zstickJog(gamepads[that.gpIndex].state['RIGHT_STICK_Y']);
 	        	        }
 	        	        this.slowDown = (this.slowDown > 5) ? 0 : this.slowDown + 1;
