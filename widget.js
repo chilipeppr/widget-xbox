@@ -426,7 +426,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
                 $(e.target).prev('span').text( $(e.target).val() )
             });
             $('#com-chilipeppr-widget-xbox-settings-container > .slider').on("change", function(e) {
-                that.options.Deadzone = $('#com-chilipeppr-widget-xbox.deadzone').val();
+                that.options.Deadzone = $('#com-chilipeppr-widget-xbox-deadzone').val();
                 that.options.RateXY = $('#com-chilipeppr-widget-xbox-ratexy').val();
                 that.options.RateZ = $('#com-chilipeppr-widget-xbox-ratez').val();
                 that.options.RPM = $('#com-chilipeppr-widget-xbox-rpm').val();
@@ -557,10 +557,10 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
                 this.hideBody();
             }
             
-            $('#Deadzone').val(options.Deadzone);
-            $('#RateXY').val(options.RateXY);
-            $('#RateZ').val(options.RateZ);
-            $('#RPM').val(options.RPM);
+            $('#com-chilipeppr-widget-xbox-deadzone').val(options.Deadzone);
+            $('#com-chilipeppr-widget-xbox-ratexy').val(options.RateXY);
+            $('#com-chilipeppr-widget-xbox-ratez').val(options.RateZ);
+            $('#com-chilipeppr-widget-xbox-rpm').val(options.RPM);
 
         },
         /**
