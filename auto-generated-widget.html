@@ -290,12 +290,13 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         
         	gamepad.bind(Gamepad.Event.AXIS_CHANGED, function(e) {
         		// e.axis changed to value e.value for gamepad e.gamepad
-        		// using a big dead-zone.  my controller's a bit wallered out.
-        		if (e.axis.includes('LEFT_STICK') && Math.abs(e.value) > 0.4 && that.joggingEnabled && !that.zjogStarted && !that.jogStarted) {
+        		var deadZone = that.options.Deadzone;
+        		
+        		if (e.axis.includes('LEFT_STICK') && Math.abs(e.value) > (deadZone + 0.1) && that.joggingEnabled && !that.zjogStarted && !that.jogStarted) {
         		    console.log('Start Jog');
         		    that.jogStarted = true;
         		    that.gpIndex = e.gamepad.index;
-        		} else if ( (e.axis = 'RIGHT_STICK_Y') && Math.abs(e.value) > 0.4 && that.joggingEnabled && !that.zjogStarted && !that.jogStarted) {
+        		} else if ( (e.axis = 'RIGHT_STICK_Y') && Math.abs(e.value) > (deadZone + 0.1) && that.joggingEnabled && !that.zjogStarted && !that.jogStarted) {
         		    console.log('Start zJog');
         		    that.zjogStarted = true;
         		    that.gpIndex = e.gamepad.index;
@@ -305,8 +306,10 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             slowDown: 0;  //60hz is just too fast
 	        gamepad.bind(Gamepad.Event.TICK, function(gamepads) {
 	        	// gamepads were updated (around 60 times a second)
+	        	var deadZone = that.options.Deadzone;
+	        	
 	        	if (that.jogStarted) {
-	        	    if (Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_X']) < 0.3 && Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_Y']) < 0.3) {
+	        	    if (Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_X']) < deadZone && Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_Y']) < deadZone) {
 	        	        console.log('Stop Jog');
 	        	        that.jogStarted = false;
 	        	        this.slowDown = 0;
@@ -318,7 +321,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
 	        	        this.slowDown = (this.slowDown > 5) ? 0 : this.slowDown + 1;
 	        	    }
 	        	} else if (that.zjogStarted) {
-	        	    if (Math.abs(gamepads[that.gpIndex].state['RIGHT_STICK_Y']) < 0.3) {
+	        	    if (Math.abs(gamepads[that.gpIndex].state['RIGHT_STICK_Y']) < deadZone) {
 	        	        console.log('Stop zJog');
 	        	        that.zjogStarted = false;
 	        	        this.slowDown = 0;
@@ -339,13 +342,15 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         },
         
         sendCtr: 0,
-        maxFeed: 1000,
+        //maxFeed: 1000,
         maxDist: 5,
         isPausedByPlanner: false, // keeps track of whether we've been told to pause sending by the planner buffer
         stickJog: function(xVal, yVal) {
             //console.log(xVal + " " + yVal);
+            var maxFeed = this.options.maxFeed;
+            
             if (!this.isPausedByPlanner) {
-                var feedRt = Math.floor( Math.sqrt( Math.pow(xVal, 2) + Math.pow(yVal, 2) ) * this.maxFeed );
+                var feedRt = Math.floor( Math.sqrt( Math.pow(xVal, 2) + Math.pow(yVal, 2) ) * maxFeed );
                 var xJog = (Math.abs(xVal) > 0.3) ? ( xVal * this.maxDist ) : 0;
                 var yJog = (Math.abs(yVal) > 0.3) ? (-1.0 * yVal * this.maxDist) : 0;
                 
@@ -369,8 +374,10 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         },
         zstickJog: function(zVal) {
             //console.log(xVal + " " + yVal);
+            var maxFeed = this.options.maxFeed;
+            
             if (!this.isPausedByPlanner) {
-                var feedRt = Math.floor( Math.abs( zVal ) * this.maxFeed / 4 );
+                var feedRt = Math.floor( Math.abs( zVal ) * maxFeed / 4 );
                 var zJog = -1.0 * zVal * this.maxDist / 4;
                 
                 var gcode = "G91 G1";
@@ -438,9 +445,24 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
          */
         setupBody: function() {
         	// Make image clickable to show modal
+        	var that = this;
         	
         	var mainImg = $('#' + this.id + " .panel-body img");
         	mainImg.on('click', this.onMainBodyImgClick.bind(this));
+        	
+            $("#xbox-settings-container > .slider").each(function(){
+                $(this).prev('span').text(this.value);
+            });
+        	$('#Deadzone, #RateXY, #RateZ, #RPM').on("input", function(e) {
+                $(e.target).prev('span').text( $(e.target).val() )
+            });
+            $('#Deadzone, #RateXY, #RateZ, #RPM').on("change", function(e) {
+                that.options.Deadzone = $('#Deadzone').val();
+                that.options.RateXY = $('#RateXY').val();
+                that.options.RateZ = $('#RateZ').val();
+                that.options.RPM = $('#RPM').val();
+                that.saveOptionsLocalStorage();
+            });
 			
         },
         onMainBodyImgClick: function(evt) {
@@ -547,8 +569,11 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
                 options = {
                     showBody: true,
                     tabShowing: 1,
-                    customParam1: null,
-                    customParam2: 1.0
+                    
+                    Deadzone: 30,
+                    RateXY: 1000,
+                    RateZ: 1000,
+                    RPM: 12000
                 };
             }
 
@@ -562,6 +587,11 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             else {
                 this.hideBody();
             }
+            
+            $('#Deadzone').val(options.Deadzone);
+            $('#RateXY').val(options.RateXY);
+            $('#RateZ').val(options.RateZ);
+            $('#RPM').val(options.RPM);
 
         },
         /**
@@ -1863,30 +1893,38 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         </div>
         <div class="panel-body" style="padding:0;">
             
-            <img src="http://raw.githubusercontent.com/chilipeppr/widget-xbox/master/xbox.webp" style="width:100%;height:100%;cursor:pointer;"/>
+            
+            
+            
             <!-- Nav tabs -->
-            <!--<ul class="nav nav-tabs" role="tablist">-->
-            <!--    <li class="active"><a href="#com-chilipeppr-widget-xbox-tab1" role="tab" data-toggle="tab">Tab 1</a>-->
-            <!--    </li>-->
-            <!--    <li><a href="#com-chilipeppr-widget-xbox-tab2" role="tab" data-toggle="tab">Tab 2</a></li>-->
-            <!--    <li><a href="#com-chilipeppr-widget-xbox-tab3" role="tab" data-toggle="tab">Tab 3</a></li>-->
-            <!--</ul>-->
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#com-chilipeppr-widget-xbox-tab1" role="tab" data-toggle="tab">Overview</a>
+                </li>
+                <li><a href="#com-chilipeppr-widget-xbox-tab2" role="tab" data-toggle="tab">Settings</a></li>
+                <!--<li><a href="#com-chilipeppr-widget-xbox-tab3" role="tab" data-toggle="tab">Tab 3</a></li>-->
+            </ul>
             <!-- Tab panes -->
 
-            <!--<div class="tab-content">-->
+            <div class="tab-content">
     
                 <!-- Tab 1 -->
-            <!--    <div class="tab-pane active" id="com-chilipeppr-widget-xbox-tab1">-->
-            <!--        <p>This is the content of tab 1.</p>-->
-            <!--        <div class="">-->
-            <!--            <button type="button" class="btn btn-xs btn-default btn-helloworld2" style="margin: 4px 0;">Hello World 2</button>-->
-            <!--        </div>-->
-            <!--    </div>-->
+                <div class="tab-pane active" id="com-chilipeppr-widget-xbox-tab1">
+                    <img src="http://raw.githubusercontent.com/chilipeppr/widget-xbox/master/xbox.webp" style="width:100%;height:100%;cursor:pointer;"/>
+                </div>
 
                 <!-- Tab 2 -->
-            <!--    <div class="tab-pane" id="com-chilipeppr-widget-xbox-tab2">-->
-            <!--        <p>This is the content of tab 2.</p>-->
-            <!--    </div>-->
+                <div class="tab-pane" id="com-chilipeppr-widget-xbox-tab2">
+                    <div id="xbox-settings-container">
+                        <p>Joystick Deadzone: </p><span></span>%
+                        <input type="range" min="0" max="100" value="0" class="slider" id="Deadzone">
+                        <p>Max Jog Rate (x/y): </p> <span></span>
+                        <input type="range" min="1" max="5000" value="1" class="slider" id="RateXY">
+                        <p>Max Jog Rate (z): </p> <span></span>
+                        <input type="range" min="1" max="5000" value="1" class="slider" id="RateZ">
+                        <p>Spindle RPM: </p> <span></span>
+                        <input type="range" min="1" max="20000" value="1" class="slider" id="RPM">
+                    </div>
+                </div>
 
                 <!-- Tab 3 -->
             <!--    <div class="tab-pane" id="com-chilipeppr-widget-xbox-tab3">-->

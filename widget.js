@@ -259,12 +259,13 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         
         	gamepad.bind(Gamepad.Event.AXIS_CHANGED, function(e) {
         		// e.axis changed to value e.value for gamepad e.gamepad
-        		// using a big dead-zone.  my controller's a bit wallered out.
-        		if (e.axis.includes('LEFT_STICK') && Math.abs(e.value) > 0.4 && that.joggingEnabled && !that.zjogStarted && !that.jogStarted) {
+        		var deadZone = that.options.Deadzone;
+        		
+        		if (e.axis.includes('LEFT_STICK') && Math.abs(e.value) > (deadZone + 0.1) && that.joggingEnabled && !that.zjogStarted && !that.jogStarted) {
         		    console.log('Start Jog');
         		    that.jogStarted = true;
         		    that.gpIndex = e.gamepad.index;
-        		} else if ( (e.axis = 'RIGHT_STICK_Y') && Math.abs(e.value) > 0.4 && that.joggingEnabled && !that.zjogStarted && !that.jogStarted) {
+        		} else if ( (e.axis = 'RIGHT_STICK_Y') && Math.abs(e.value) > (deadZone + 0.1) && that.joggingEnabled && !that.zjogStarted && !that.jogStarted) {
         		    console.log('Start zJog');
         		    that.zjogStarted = true;
         		    that.gpIndex = e.gamepad.index;
@@ -274,8 +275,10 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             slowDown: 0;  //60hz is just too fast
 	        gamepad.bind(Gamepad.Event.TICK, function(gamepads) {
 	        	// gamepads were updated (around 60 times a second)
+	        	var deadZone = that.options.Deadzone;
+	        	
 	        	if (that.jogStarted) {
-	        	    if (Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_X']) < 0.3 && Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_Y']) < 0.3) {
+	        	    if (Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_X']) < deadZone && Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_Y']) < deadZone) {
 	        	        console.log('Stop Jog');
 	        	        that.jogStarted = false;
 	        	        this.slowDown = 0;
@@ -287,7 +290,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
 	        	        this.slowDown = (this.slowDown > 5) ? 0 : this.slowDown + 1;
 	        	    }
 	        	} else if (that.zjogStarted) {
-	        	    if (Math.abs(gamepads[that.gpIndex].state['RIGHT_STICK_Y']) < 0.3) {
+	        	    if (Math.abs(gamepads[that.gpIndex].state['RIGHT_STICK_Y']) < deadZone) {
 	        	        console.log('Stop zJog');
 	        	        that.zjogStarted = false;
 	        	        this.slowDown = 0;
@@ -308,13 +311,15 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         },
         
         sendCtr: 0,
-        maxFeed: 1000,
+        //maxFeed: 1000,
         maxDist: 5,
         isPausedByPlanner: false, // keeps track of whether we've been told to pause sending by the planner buffer
         stickJog: function(xVal, yVal) {
             //console.log(xVal + " " + yVal);
+            var maxFeed = this.options.maxFeed;
+            
             if (!this.isPausedByPlanner) {
-                var feedRt = Math.floor( Math.sqrt( Math.pow(xVal, 2) + Math.pow(yVal, 2) ) * this.maxFeed );
+                var feedRt = Math.floor( Math.sqrt( Math.pow(xVal, 2) + Math.pow(yVal, 2) ) * maxFeed );
                 var xJog = (Math.abs(xVal) > 0.3) ? ( xVal * this.maxDist ) : 0;
                 var yJog = (Math.abs(yVal) > 0.3) ? (-1.0 * yVal * this.maxDist) : 0;
                 
@@ -338,8 +343,10 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         },
         zstickJog: function(zVal) {
             //console.log(xVal + " " + yVal);
+            var maxFeed = this.options.maxFeed;
+            
             if (!this.isPausedByPlanner) {
-                var feedRt = Math.floor( Math.abs( zVal ) * this.maxFeed / 4 );
+                var feedRt = Math.floor( Math.abs( zVal ) * maxFeed / 4 );
                 var zJog = -1.0 * zVal * this.maxDist / 4;
                 
                 var gcode = "G91 G1";
@@ -407,9 +414,24 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
          */
         setupBody: function() {
         	// Make image clickable to show modal
+        	var that = this;
         	
         	var mainImg = $('#' + this.id + " .panel-body img");
         	mainImg.on('click', this.onMainBodyImgClick.bind(this));
+        	
+            $("#xbox-settings-container > .slider").each(function(){
+                $(this).prev('span').text(this.value);
+            });
+        	$('#Deadzone, #RateXY, #RateZ, #RPM').on("input", function(e) {
+                $(e.target).prev('span').text( $(e.target).val() )
+            });
+            $('#Deadzone, #RateXY, #RateZ, #RPM').on("change", function(e) {
+                that.options.Deadzone = $('#Deadzone').val();
+                that.options.RateXY = $('#RateXY').val();
+                that.options.RateZ = $('#RateZ').val();
+                that.options.RPM = $('#RPM').val();
+                that.saveOptionsLocalStorage();
+            });
 			
         },
         onMainBodyImgClick: function(evt) {
@@ -516,8 +538,11 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
                 options = {
                     showBody: true,
                     tabShowing: 1,
-                    customParam1: null,
-                    customParam2: 1.0
+                    
+                    Deadzone: 30,
+                    RateXY: 1000,
+                    RateZ: 1000,
+                    RPM: 12000
                 };
             }
 
@@ -531,6 +556,11 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             else {
                 this.hideBody();
             }
+            
+            $('#Deadzone').val(options.Deadzone);
+            $('#RateXY').val(options.RateXY);
+            $('#RateZ').val(options.RateZ);
+            $('#RPM').val(options.RPM);
 
         },
         /**

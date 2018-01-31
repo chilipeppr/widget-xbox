@@ -56,30 +56,38 @@
         </div>
         <div class="panel-body" style="padding:0;">
             
-            <img src="http://raw.githubusercontent.com/chilipeppr/widget-xbox/master/xbox.webp" style="width:100%;height:100%;cursor:pointer;"/>
+            
+            
+            
             <!-- Nav tabs -->
-            <!--<ul class="nav nav-tabs" role="tablist">-->
-            <!--    <li class="active"><a href="#com-chilipeppr-widget-xbox-tab1" role="tab" data-toggle="tab">Tab 1</a>-->
-            <!--    </li>-->
-            <!--    <li><a href="#com-chilipeppr-widget-xbox-tab2" role="tab" data-toggle="tab">Tab 2</a></li>-->
-            <!--    <li><a href="#com-chilipeppr-widget-xbox-tab3" role="tab" data-toggle="tab">Tab 3</a></li>-->
-            <!--</ul>-->
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#com-chilipeppr-widget-xbox-tab1" role="tab" data-toggle="tab">Overview</a>
+                </li>
+                <li><a href="#com-chilipeppr-widget-xbox-tab2" role="tab" data-toggle="tab">Settings</a></li>
+                <!--<li><a href="#com-chilipeppr-widget-xbox-tab3" role="tab" data-toggle="tab">Tab 3</a></li>-->
+            </ul>
             <!-- Tab panes -->
 
-            <!--<div class="tab-content">-->
+            <div class="tab-content">
     
                 <!-- Tab 1 -->
-            <!--    <div class="tab-pane active" id="com-chilipeppr-widget-xbox-tab1">-->
-            <!--        <p>This is the content of tab 1.</p>-->
-            <!--        <div class="">-->
-            <!--            <button type="button" class="btn btn-xs btn-default btn-helloworld2" style="margin: 4px 0;">Hello World 2</button>-->
-            <!--        </div>-->
-            <!--    </div>-->
+                <div class="tab-pane active" id="com-chilipeppr-widget-xbox-tab1">
+                    <img src="http://raw.githubusercontent.com/chilipeppr/widget-xbox/master/xbox.webp" style="width:100%;height:100%;cursor:pointer;"/>
+                </div>
 
                 <!-- Tab 2 -->
-            <!--    <div class="tab-pane" id="com-chilipeppr-widget-xbox-tab2">-->
-            <!--        <p>This is the content of tab 2.</p>-->
-            <!--    </div>-->
+                <div class="tab-pane" id="com-chilipeppr-widget-xbox-tab2">
+                    <div id="xbox-settings-container">
+                        <p>Joystick Deadzone: </p><span></span>%
+                        <input type="range" min="0" max="100" value="0" class="slider" id="Deadzone">
+                        <p>Max Jog Rate (x/y): </p> <span></span>
+                        <input type="range" min="1" max="5000" value="1" class="slider" id="RateXY">
+                        <p>Max Jog Rate (z): </p> <span></span>
+                        <input type="range" min="1" max="5000" value="1" class="slider" id="RateZ">
+                        <p>Spindle RPM: </p> <span></span>
+                        <input type="range" min="1" max="20000" value="1" class="slider" id="RPM">
+                    </div>
+                </div>
 
                 <!-- Tab 3 -->
             <!--    <div class="tab-pane" id="com-chilipeppr-widget-xbox-tab3">-->
