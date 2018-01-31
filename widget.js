@@ -259,7 +259,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         
         	gamepad.bind(Gamepad.Event.AXIS_CHANGED, function(e) {
         		// e.axis changed to value e.value for gamepad e.gamepad
-        		var deadZone = that.options.Deadzone;
+        		var deadZone = that.options.Deadzone / 100;
         		
         		if (e.axis.includes('LEFT_STICK') && Math.abs(e.value) > (deadZone + 0.1) && that.joggingEnabled && !that.zjogStarted && !that.jogStarted) {
         		    console.log('Start Jog');
@@ -275,7 +275,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             slowDown: 0;  //60hz is just too fast
 	        gamepad.bind(Gamepad.Event.TICK, function(gamepads) {
 	        	// gamepads were updated (around 60 times a second)
-	        	var deadZone = that.options.Deadzone;
+	        	var deadZone = that.options.Deadzone / 100;
 	        	
 	        	if (that.jogStarted) {
 	        	    if (Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_X']) < deadZone && Math.abs(gamepads[that.gpIndex].state['LEFT_STICK_Y']) < deadZone) {
