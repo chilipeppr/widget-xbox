@@ -311,17 +311,17 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         },
         
         sendCtr: 0,
-        //maxFeed: 1000,
         maxDist: 5,
         isPausedByPlanner: false, // keeps track of whether we've been told to pause sending by the planner buffer
         stickJog: function(xVal, yVal) {
             //console.log(xVal + " " + yVal);
             var maxFeed = this.options.RateXY;
+            var deadZone = this.options.Deadzone / 100;
             
             if (!this.isPausedByPlanner) {
                 var feedRt = Math.floor( Math.sqrt( Math.pow(xVal, 2) + Math.pow(yVal, 2) ) * maxFeed );
-                var xJog = (Math.abs(xVal) > 0.3) ? ( xVal * this.maxDist ) : 0;
-                var yJog = (Math.abs(yVal) > 0.3) ? (-1.0 * yVal * this.maxDist) : 0;
+                var xJog = (Math.abs(xVal) > deadZone) ? ( xVal * this.maxDist ) : 0;
+                var yJog = (Math.abs(yVal) > deadZone) ? (-1.0 * yVal * this.maxDist) : 0;
                 
                 var gcode = "G91 G1";
                 gcode += " F" + feedRt;
@@ -419,17 +419,17 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         	var mainImg = $('#' + this.id + " .panel-body img");
         	mainImg.on('click', this.onMainBodyImgClick.bind(this));
         	
-            $("#xbox-settings-container > .slider").each(function(){
+            $("#com-chilipeppr-widget-xbox-settings-container > .slider").each(function(){
                 $(this).prev('span').text(this.value);
             });
-        	$('#Deadzone, #RateXY, #RateZ, #RPM').on("input", function(e) {
+        	$('#com-chilipeppr-widget-xbox-settings-container > .slider').on("input", function(e) {
                 $(e.target).prev('span').text( $(e.target).val() )
             });
-            $('#Deadzone, #RateXY, #RateZ, #RPM').on("change", function(e) {
-                that.options.Deadzone = $('#Deadzone').val();
-                that.options.RateXY = $('#RateXY').val();
-                that.options.RateZ = $('#RateZ').val();
-                that.options.RPM = $('#RPM').val();
+            $('#com-chilipeppr-widget-xbox-settings-container > .slider').on("change", function(e) {
+                that.options.Deadzone = $('#com-chilipeppr-widget-xbox.deadzone').val();
+                that.options.RateXY = $('#com-chilipeppr-widget-xbox-ratexy').val();
+                that.options.RateZ = $('#com-chilipeppr-widget-xbox-ratez').val();
+                that.options.RPM = $('#com-chilipeppr-widget-xbox-rpm').val();
                 that.saveOptionsLocalStorage();
             });
 			
