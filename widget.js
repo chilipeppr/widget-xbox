@@ -317,7 +317,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             //console.log(xVal + " " + yVal);
             var maxFeed = this.options.RateXY;
             var deadZone = this.options.Deadzone / 100;
-            var maxDist = maxFeed / 600;
+            var maxDist = maxFeed / 400;
             
             if (!this.isPausedByPlanner) {
                 var feedRt = Math.floor( Math.sqrt( Math.pow(xVal, 2) + Math.pow(yVal, 2) ) * maxFeed );
@@ -345,7 +345,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         zstickJog: function(zVal) {
             //console.log(xVal + " " + yVal);
             var maxFeed = this.options.RateZ;
-            var maxDist = maxFeed / 600;
+            var maxDist = maxFeed / 400;
             
             if (!this.isPausedByPlanner) {
                 var feedRt = Math.floor( Math.abs( zVal ) * maxFeed / 4 );
