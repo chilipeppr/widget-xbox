@@ -252,6 +252,22 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             				that.lastCoolantCmd = "M7";
             			}
         		        break;
+        		    case 'DPAD_UP':
+        			    that.sendGcode("G91 G1 F" + that.options.RateXY + " Y" + that.options.IncJog);
+        			    that.sendGcode("G90");
+        		        break;
+        		    case 'DPAD_DOWN':
+        		        that.sendGcode("G91 G1 F" + that.options.RateXY + " Y" + (that.options.IncJog * -1.0) );
+        			    that.sendGcode("G90");
+        		        break;
+        		    case 'DPAD_LEFT':
+        		        that.sendGcode("G91 G1 F" + that.options.RateXY + " X" + that.options.IncJog);
+        			    that.sendGcode("G90");
+        		        break;
+        		    case 'DPAD_RIGHT':
+        		        that.sendGcode("G91 G1 F" + that.options.RateXY + " X" + (that.options.IncJog * -1.0) );
+        			    that.sendGcode("G90");
+        		        break;
         		    case 'START_FORWARD':
         		        // Got start button.  enable/disable jogging
         		        that.joggingEnabled = !that.joggingEnabled;
@@ -555,6 +571,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
                     Deadzone: 30,
                     RateXY: 1000,
                     RateZ: 1000,
+                    IncJog: 1,
                     RPM: 12000
                 };
             }
@@ -573,6 +590,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             $('#com-chilipeppr-widget-xbox-deadzone').val(options.Deadzone);
             $('#com-chilipeppr-widget-xbox-ratexy').val(options.RateXY);
             $('#com-chilipeppr-widget-xbox-ratez').val(options.RateZ);
+            $('#com-chilipeppr-widget-xbox-incjog').val(options.IncJog);
             $('#com-chilipeppr-widget-xbox-rpm').val(options.RPM);
 
         },
