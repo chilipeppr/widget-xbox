@@ -317,11 +317,12 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             //console.log(xVal + " " + yVal);
             var maxFeed = this.options.RateXY;
             var deadZone = this.options.Deadzone / 100;
+            var maxDist = maxFeed / 600;
             
             if (!this.isPausedByPlanner) {
                 var feedRt = Math.floor( Math.sqrt( Math.pow(xVal, 2) + Math.pow(yVal, 2) ) * maxFeed );
-                var xJog = (Math.abs(xVal) > deadZone) ? ( xVal * this.maxDist ) : 0;
-                var yJog = (Math.abs(yVal) > deadZone) ? (-1.0 * yVal * this.maxDist) : 0;
+                var xJog = (Math.abs(xVal) > deadZone) ? ( xVal * maxDist ) : 0;
+                var yJog = (Math.abs(yVal) > deadZone) ? (-1.0 * yVal * maxDist) : 0;
                 
                 var gcode = "G91 G1";
                 gcode += " F" + feedRt;
@@ -344,10 +345,11 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         zstickJog: function(zVal) {
             //console.log(xVal + " " + yVal);
             var maxFeed = this.options.RateZ;
+            var maxDist = maxFeed / 600;
             
             if (!this.isPausedByPlanner) {
                 var feedRt = Math.floor( Math.abs( zVal ) * maxFeed / 4 );
-                var zJog = -1.0 * zVal * this.maxDist / 4;
+                var zJog = -1.0 * zVal * maxDist;  //this.maxDist / 4;
                 
                 var gcode = "G91 G1";
                 gcode += " F" + feedRt;
