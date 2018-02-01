@@ -155,6 +155,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
          * Keep track of whether we sent flood/coolant on or off last time
          */
         lastCoolantCmd: "",
+        lastSpindleCmd: "",
         /**
          * This object holds the Gamepad library from https://github.com/kallaspriit/HTML5-JavaScript-Gamepad-Controller-Library
          */
@@ -228,6 +229,17 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		    case 'FACE_2':
         		        // Got B button for Feedhold
         			    that.sendGcode("!");
+        		        break;
+        		    case 'FACE_3':
+        		        // Got X button for spindle toggle
+            			// See what we sent last time and send other cmd
+            			if (that.lastSpindleCmd == "M5") {
+            				that.sendGcode("M3 S" + that.options.RPM);
+            				that.lastSpindleCmd = "M3";
+            			} else {
+            				that.sendGcode("M5");
+            				that.lastSpindleCmd = "M5";
+            			}
         		        break;
         		    case 'FACE_4':
         		        // Got Y button for coolant toggle
@@ -311,7 +323,6 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         },
         
         sendCtr: 0,
-        maxDist: 5,
         isPausedByPlanner: false, // keeps track of whether we've been told to pause sending by the planner buffer
         stickJog: function(xVal, yVal) {
             //console.log(xVal + " " + yVal);

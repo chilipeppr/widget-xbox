@@ -189,6 +189,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
          * Keep track of whether we sent flood/coolant on or off last time
          */
         lastCoolantCmd: "",
+        lastSpindleCmd: "",
         /**
          * This object holds the Gamepad library from https://github.com/kallaspriit/HTML5-JavaScript-Gamepad-Controller-Library
          */
@@ -262,6 +263,17 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		    case 'FACE_2':
         		        // Got B button for Feedhold
         			    that.sendGcode("!");
+        		        break;
+        		    case 'FACE_3':
+        		        // Got X button for spindle toggle
+            			// See what we sent last time and send other cmd
+            			if (that.lastSpindleCmd == "M5") {
+            				that.sendGcode("M3 S" + that.options.RPM);
+            				that.lastSpindleCmd = "M3";
+            			} else {
+            				that.sendGcode("M5");
+            				that.lastSpindleCmd = "M5";
+            			}
         		        break;
         		    case 'FACE_4':
         		        // Got Y button for coolant toggle
@@ -345,7 +357,6 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         },
         
         sendCtr: 0,
-        maxDist: 5,
         isPausedByPlanner: false, // keeps track of whether we've been told to pause sending by the planner buffer
         stickJog: function(xVal, yVal) {
             //console.log(xVal + " " + yVal);
@@ -1920,13 +1931,13 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
                 <!-- Tab 2 -->
                 <div class="tab-pane" id="com-chilipeppr-widget-xbox-tab2">
                     <div id="com-chilipeppr-widget-xbox-settings-container">
-                        <p>Joystick Deadzone: </p><span></span>%
+                        <h6 class="text-info">Joystick Deadzone: </h6><span></span>%
                         <input type="range" min="0" max="100" value="0" class="slider" id="com-chilipeppr-widget-xbox-deadzone">
-                        <p>Max Jog Rate (x/y): </p> <span></span>
+                        <h6 class="text-info">Max Jog Rate (x/y): </h6> <span></span>
                         <input type="range" min="1" max="5000" value="1" class="slider" id="com-chilipeppr-widget-xbox-ratexy">
-                        <p>Max Jog Rate (z): </p> <span></span>
+                        <h6 class="text-info">Max Jog Rate (z): </h6> <span></span>
                         <input type="range" min="1" max="5000" value="1" class="slider" id="com-chilipeppr-widget-xbox-ratez">
-                        <p>Spindle RPM: </p> <span></span>
+                        <h6 class="text-info">Spindle RPM: </h6> <span></span>
                         <input type="range" min="1" max="20000" value="1" class="slider" id="com-chilipeppr-widget-xbox-rpm">
                     </div>
                 </div>
