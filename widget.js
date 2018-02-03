@@ -169,7 +169,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
          * Xbox controller.
          */
          
-        joggingEnabled: false,
+        joggingEnabled: true,
         jogStarted: false,
         zjogStarted: false,
         gpIndex: 0,
@@ -226,6 +226,9 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		console.log("e.control of gamepad e.gamepad pressed down. e:", e);
         		 
         		switch (e.control) {
+        		    case 'FACE_1':
+        		        // Got A button for z probing
+                        break;
         		    case 'FACE_2':
         		        // Got B button for Feedhold
         			    that.sendGcode("!");
@@ -269,7 +272,10 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         			    that.sendGcode("G90");
         		        break;
         		    case 'START_FORWARD':
-        		        // Got start button.  enable/disable jogging
+        		        chilipeppr.publish('/com-chilipeppr-widget-gcode/play', "");
+        		        break;
+        		    case 'SELECT_BACK':
+        		        // Got start button.  enable/disable stick jogging
         		        that.joggingEnabled = !that.joggingEnabled;
         		        chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', 
         		            "Xbox Controller Button Down", "Toggle Jog Enable: " + that.joggingEnabled, 500, true);
@@ -282,7 +288,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         	
         	gamepad.bind(Gamepad.Event.BUTTON_UP, function(e) {
         		// e.control of gamepad e.gamepad released
-        		console.log(" e.control of gamepad e.gamepad released. e:", e);
+        		//console.log(" e.control of gamepad e.gamepad released. e:", e);
         	});
         
         	gamepad.bind(Gamepad.Event.AXIS_CHANGED, function(e) {
