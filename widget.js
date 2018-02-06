@@ -228,6 +228,11 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		switch (e.control) {
         		    case 'FACE_1':
         		        // Got A button for z probing
+        		        if ($('#com-chilipeppr-ws-touchplate').hasClass('hidden')) {
+        		            $('#com-chilipeppr-ws-menu .touchplate-button').click();
+        		        } else {
+        		            chilipeppr.publish('/com-chilipeppr-widget-touchplate/probe', "");
+        		        }
                         break;
         		    case 'FACE_2':
         		        // Got B button for Feedhold
