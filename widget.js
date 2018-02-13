@@ -232,7 +232,7 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		            $('#com-chilipeppr-ws-menu .touchplate-button').click();
         		        } else {
         		            // chilipeppr.publish('/com-chilipeppr-widget-touchplate/probe', "");
-        		            $('#com-chilipeppr-ws-menu .touchplate-button').click();
+        		            $('#com-chilipeppr-widget-touchplate .btn-touchplaterun').click();
         		        }
                         break;
         		    case 'FACE_2':
