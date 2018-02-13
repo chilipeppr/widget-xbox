@@ -231,7 +231,8 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         		        if ($('#com-chilipeppr-ws-touchplate').hasClass('hidden')) {
         		            $('#com-chilipeppr-ws-menu .touchplate-button').click();
         		        } else {
-        		            chilipeppr.publish('/com-chilipeppr-widget-touchplate/probe', "");
+        		            // chilipeppr.publish('/com-chilipeppr-widget-touchplate/probe', "");
+        		            $('#com-chilipeppr-ws-menu .touchplate-button').click();
         		        }
                         break;
         		    case 'FACE_2':
@@ -261,19 +262,19 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
             			}
         		        break;
         		    case 'DPAD_UP':
-        			    that.sendGcode("G91 G1 F" + that.options.RateXY + " Y" + that.options.IncJog);
+        			    that.sendGcode("G91 G1 F" + that.options.RateXY + " Y" + (that.options.IncJog * 0.1) );
         			    that.sendGcode("G90");
         		        break;
         		    case 'DPAD_DOWN':
-        		        that.sendGcode("G91 G1 F" + that.options.RateXY + " Y" + (that.options.IncJog * -1.0) );
+        		        that.sendGcode("G91 G1 F" + that.options.RateXY + " Y" + (that.options.IncJog * -0.1) );
         			    that.sendGcode("G90");
         		        break;
         		    case 'DPAD_LEFT':
-        		        that.sendGcode("G91 G1 F" + that.options.RateXY + " X" + (that.options.IncJog * -1.0) );
+        		        that.sendGcode("G91 G1 F" + that.options.RateXY + " X" + (that.options.IncJog * -0.1) );
         			    that.sendGcode("G90");
         		        break;
         		    case 'DPAD_RIGHT':
-        		        that.sendGcode("G91 G1 F" + that.options.RateXY + " X" + that.options.IncJog);
+        		        that.sendGcode("G91 G1 F" + that.options.RateXY + " X" + (that.options.IncJog * 0.1) );
         			    that.sendGcode("G90");
         		        break;
         		    case 'START_FORWARD':
@@ -460,10 +461,18 @@ cpdefine("inline:com-chilipeppr-widget-xbox", ["chilipeppr_ready", /* other depe
         	mainImg.on('click', this.onMainBodyImgClick.bind(this));
         	
             $("#com-chilipeppr-widget-xbox-settings-container > .slider").each(function(){
-                $(this).prev('span').text(this.value);
+                if ( this.id == 'com-chilipeppr-widget-xbox-incjog' ) {
+        	        $(this).prev('span').text( this.value / 10 )
+        	    } else {
+                    $(this).prev('span').text(this.value)
+        	    }
             });
         	$('#com-chilipeppr-widget-xbox-settings-container > .slider').on("input", function(e) {
-                $(e.target).prev('span').text( $(e.target).val() )
+        	    if ( e.target.id == 'com-chilipeppr-widget-xbox-incjog' ) {
+        	        $(e.target).prev('span').text( $(e.target).val() / 10 )
+        	    } else {
+                    $(e.target).prev('span').text( $(e.target).val() )
+        	    }
             });
             $('#com-chilipeppr-widget-xbox-settings-container > .slider').on("change", function(e) {
                 that.options.Deadzone = $('#com-chilipeppr-widget-xbox-deadzone').val();
